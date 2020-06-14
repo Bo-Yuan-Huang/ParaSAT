@@ -15,3 +15,7 @@ add_executable(${PARASAT_EXE_NAME}
 ##
 target_link_libraries(${PARASAT_EXE_NAME} PUBLIC ${PARASAT_LIB_NAME})
 
+##
+## BFG::Lyra (CLI parser)
+##
+target_link_libraries(${PARASAT_EXE_NAME} PUBLIC BFG::Lyra)

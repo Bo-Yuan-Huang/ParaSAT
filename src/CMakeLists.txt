@@ -44,12 +44,6 @@ target_include_directories(${PARASAT_LIB_NAME}
 # external dependencies
 # ---------------------------------------------------------------------------- #
 ##
-## ZLIB
-##
-find_package(ZLIB REQUIRED)
-target_link_libraries(${PARASAT_LIB_NAME} PUBLIC ZLIB::ZLIB)
-
-##
 ## filesystem
 ##
 if(NOT APPLE)
@@ -57,20 +51,17 @@ if(NOT APPLE)
 endif()
 
 ##
+## ZLIB
+##
+find_package(ZLIB REQUIRED)
+target_link_libraries(${PARASAT_LIB_NAME} PRIVATE ZLIB::ZLIB)
+
+##
 ## glog
 ##
-#if(NOT TARGET glog::glog)
-#  find_package(glog REQUIRED)
-#endif()
-
-#target_link_libraries(${PARASAT_LIB_NAME} PUBLIC glog::glog)
+target_link_libraries(${PARASAT_LIB_NAME} PRIVATE glog::glog)
 
 ##
 ## fmt lib
 ##
-#if(NOT TARGET fmt::fmt)
-#  find_package(fmt REQUIRED)
-#endif()
-#
-#target_link_libraries(${PARASAT_LIB_NAME} PUBLIC fmt::fmt)
-
+target_link_libraries(${PARASAT_LIB_NAME} PRIVATE fmt::fmt)
