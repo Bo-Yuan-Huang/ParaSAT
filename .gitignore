@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Buffer
+*.swp
+
+# Build
+build/*
