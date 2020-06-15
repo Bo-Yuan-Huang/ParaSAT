@@ -130,6 +130,6 @@ endif()
 # ---------------------------------------------------------------------------- #
 if(${PARASAT_BUILD_TEST})
   enable_testing()
-  # add_subdirectory(test)
+  add_subdirectory(test)
 endif()
 

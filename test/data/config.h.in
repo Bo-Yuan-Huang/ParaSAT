@@ -1,0 +1,8 @@
+#ifndef TEST_CONFIG_H__
+#define TEST_CONFIG_H__
+
+#cmakedefine PARASAT_TEST_SRC_ROOT "@PARASAT_TEST_SRC_ROOT@"
+
+#define PARASAT_TEST_DATA_DIR "@PARASAT_TEST_SRC_ROOT@/data"
+
+#endif // TEST_CONFIG_H__
