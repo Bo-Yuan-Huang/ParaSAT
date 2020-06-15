@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /*****************************************************************************************[Alloc.h]
 Copyright (c) 2008-2010, Niklas Sorensson
 
@@ -31,7 +55,7 @@ namespace parasat {
 // Simple Region-based memory allocator:
 
 template <class T> class RegionAllocator {
-  T *memory;
+  T* memory;
   uint32_t sz;
   uint32_t cap;
   uint32_t wasted_;
@@ -60,30 +84,29 @@ public:
   void free(int size) { wasted_ += size; }
 
   // Deref, Load Effective Address (LEA), Inverse of LEA (AEL):
-  T &operator[](Ref r) {
+  T& operator[](Ref r) {
     assert(r < sz);
     return memory[r];
   }
-  const T &operator[](Ref r) const {
+  const T& operator[](Ref r) const {
     assert(r < sz);
     return memory[r];
   }
 
-  T *lea(Ref r) {
+  T* lea(Ref r) {
     assert(r < sz);
     return &memory[r];
   }
-  const T *lea(Ref r) const {
+  const T* lea(Ref r) const {
     assert(r < sz);
     return &memory[r];
   }
-  Ref ael(const T *t) {
-    assert((void *)t >= (void *)&memory[0] &&
-           (void *)t < (void *)&memory[sz - 1]);
+  Ref ael(const T* t) {
+    assert((void*)t >= (void*)&memory[0] && (void*)t < (void*)&memory[sz - 1]);
     return (Ref)(t - &memory[0]);
   }
 
-  void moveTo(RegionAllocator &to) {
+  void moveTo(RegionAllocator& to) {
     if (to.memory != NULL)
       ::free(to.memory);
     to.memory = memory;
@@ -116,7 +139,7 @@ template <class T> void RegionAllocator<T>::capacity(uint32_t min_cap) {
   // printf(" .. (%p) cap = %u\n", this, cap);
 
   assert(cap > 0);
-  memory = (T *)xrealloc(memory, sizeof(T) * cap);
+  memory = (T*)xrealloc(memory, sizeof(T) * cap);
 }
 
 template <class T>

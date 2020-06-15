@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /***************************************************************************************[Options.h]
 Copyright (c) 2008-2010, Niklas Sorensson
 
@@ -36,44 +60,44 @@ namespace parasat {
 //==================================================================================================
 // Top-level option parse/help functions:
 
-extern void parseOptions(int &argc, char **argv, bool strict = false);
-extern void printUsageAndExit(int argc, char **argv, bool verbose = false);
-extern void setUsageHelp(const char *str);
-extern void setHelpPrefixStr(const char *str);
+extern void parseOptions(int& argc, char** argv, bool strict = false);
+extern void printUsageAndExit(int argc, char** argv, bool verbose = false);
+extern void setUsageHelp(const char* str);
+extern void setHelpPrefixStr(const char* str);
 
 //==================================================================================================
 // Options is an abstract class that gives the interface for all types options:
 
 class Option {
 protected:
-  const char *name;
-  const char *description;
-  const char *category;
-  const char *type_name;
+  const char* name;
+  const char* description;
+  const char* category;
+  const char* type_name;
 
-  static vec<Option *> &getOptionList() {
-    static vec<Option *> options;
+  static vec<Option*>& getOptionList() {
+    static vec<Option*> options;
     return options;
   }
-  static const char *&getUsageString() {
-    static const char *usage_str;
+  static const char*& getUsageString() {
+    static const char* usage_str;
     return usage_str;
   }
-  static const char *&getHelpPrefixString() {
-    static const char *help_prefix_str = "";
+  static const char*& getHelpPrefixString() {
+    static const char* help_prefix_str = "";
     return help_prefix_str;
   }
 
   struct OptionLt {
-    bool operator()(const Option *x, const Option *y) {
+    bool operator()(const Option* x, const Option* y) {
       int test1 = strcmp(x->category, y->category);
       return test1 < 0 ||
              (test1 == 0 && strcmp(x->type_name, y->type_name) < 0);
     }
   };
 
-  Option(const char *name_, const char *desc_, const char *cate_,
-         const char *type_)
+  Option(const char* name_, const char* desc_, const char* cate_,
+         const char* type_)
       : name(name_), description(desc_), category(cate_), type_name(type_) {
     getOptionList().push(this);
   }
@@ -81,13 +105,13 @@ protected:
 public:
   virtual ~Option() {}
 
-  virtual bool parse(const char *str) = 0;
+  virtual bool parse(const char* str) = 0;
   virtual void help(bool verbose = false) = 0;
 
-  friend void parseOptions(int &argc, char **argv, bool strict);
-  friend void printUsageAndExit(int argc, char **argv, bool verbose);
-  friend void setUsageHelp(const char *str);
-  friend void setHelpPrefixStr(const char *str);
+  friend void parseOptions(int& argc, char** argv, bool strict);
+  friend void printUsageAndExit(int argc, char** argv, bool verbose);
+  friend void setUsageHelp(const char* str);
+  friend void setHelpPrefixStr(const char* str);
 };
 
 //==================================================================================================
@@ -123,7 +147,7 @@ protected:
   double value;
 
 public:
-  DoubleOption(const char *c, const char *n, const char *d,
+  DoubleOption(const char* c, const char* n, const char* d,
                double def = double(),
                DoubleRange r = DoubleRange(-HUGE_VAL, false, HUGE_VAL, false))
       : Option(n, d, c, "<double>"), range(r), value(def) {
@@ -132,19 +156,19 @@ public:
   }
 
   operator double(void) const { return value; }
-  operator double &(void) { return value; }
-  DoubleOption &operator=(double x) {
+  operator double&(void) { return value; }
+  DoubleOption& operator=(double x) {
     value = x;
     return *this;
   }
 
-  virtual bool parse(const char *str) {
-    const char *span = str;
+  virtual bool parse(const char* str) {
+    const char* span = str;
 
     if (!match(span, "-") || !match(span, name) || !match(span, "="))
       return false;
 
-    char *end;
+    char* end;
     double tmp = strtod(span, &end);
 
     if (end == NULL)
@@ -186,25 +210,25 @@ protected:
   int32_t value;
 
 public:
-  IntOption(const char *c, const char *n, const char *d,
+  IntOption(const char* c, const char* n, const char* d,
             int32_t def = int32_t(),
             IntRange r = IntRange(INT32_MIN, INT32_MAX))
       : Option(n, d, c, "<int32>"), range(r), value(def) {}
 
   operator int32_t(void) const { return value; }
-  operator int32_t &(void) { return value; }
-  IntOption &operator=(int32_t x) {
+  operator int32_t&(void) { return value; }
+  IntOption& operator=(int32_t x) {
     value = x;
     return *this;
   }
 
-  virtual bool parse(const char *str) {
-    const char *span = str;
+  virtual bool parse(const char* str) {
+    const char* span = str;
 
     if (!match(span, "-") || !match(span, name) || !match(span, "="))
       return false;
 
-    char *end;
+    char* end;
     int32_t tmp = strtol(span, &end, 10);
 
     if (end == NULL)
@@ -255,25 +279,25 @@ protected:
   int64_t value;
 
 public:
-  Int64Option(const char *c, const char *n, const char *d,
+  Int64Option(const char* c, const char* n, const char* d,
               int64_t def = int64_t(),
               Int64Range r = Int64Range(INT64_MIN, INT64_MAX))
       : Option(n, d, c, "<int64>"), range(r), value(def) {}
 
   operator int64_t(void) const { return value; }
-  operator int64_t &(void) { return value; }
-  Int64Option &operator=(int64_t x) {
+  operator int64_t&(void) { return value; }
+  Int64Option& operator=(int64_t x) {
     value = x;
     return *this;
   }
 
-  virtual bool parse(const char *str) {
-    const char *span = str;
+  virtual bool parse(const char* str) {
+    const char* span = str;
 
     if (!match(span, "-") || !match(span, name) || !match(span, "="))
       return false;
 
-    char *end;
+    char* end;
     int64_t tmp = strtoll(span, &end, 10);
 
     if (end == NULL)
@@ -319,22 +343,22 @@ public:
 // String option:
 
 class StringOption : public Option {
-  const char *value;
+  const char* value;
 
 public:
-  StringOption(const char *c, const char *n, const char *d,
-               const char *def = NULL)
+  StringOption(const char* c, const char* n, const char* d,
+               const char* def = NULL)
       : Option(n, d, c, "<string>"), value(def) {}
 
-  operator const char *(void)const { return value; }
-  operator const char *&(void) { return value; }
-  StringOption &operator=(const char *x) {
+  operator const char*(void)const { return value; }
+  operator const char*&(void) { return value; }
+  StringOption& operator=(const char* x) {
     value = x;
     return *this;
   }
 
-  virtual bool parse(const char *str) {
-    const char *span = str;
+  virtual bool parse(const char* str) {
+    const char* span = str;
 
     if (!match(span, "-") || !match(span, name) || !match(span, "="))
       return false;
@@ -359,18 +383,18 @@ class BoolOption : public Option {
   bool value;
 
 public:
-  BoolOption(const char *c, const char *n, const char *d, bool v)
+  BoolOption(const char* c, const char* n, const char* d, bool v)
       : Option(n, d, c, "<bool>"), value(v) {}
 
   operator bool(void) const { return value; }
-  operator bool &(void) { return value; }
-  BoolOption &operator=(bool b) {
+  operator bool&(void) { return value; }
+  BoolOption& operator=(bool b) {
     value = b;
     return *this;
   }
 
-  virtual bool parse(const char *str) {
-    const char *span = str;
+  virtual bool parse(const char* str) {
+    const char* span = str;
 
     if (match(span, "-")) {
       bool b = !match(span, "no-");

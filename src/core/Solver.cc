@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /***************************************************************************************[Solver.cc]
 Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
 Copyright (c) 2007-2010, Niklas Sorensson
@@ -32,7 +56,7 @@ using namespace parasat;
 //=================================================================================================
 // Options:
 
-static const char *_cat = "CORE";
+static const char* _cat = "CORE";
 
 static DoubleOption opt_var_decay(_cat, "var-decay",
                                   "The variable activity decay factor", 0.95,
@@ -158,7 +182,7 @@ void Solver::releaseVar(Lit l) {
   }
 }
 
-bool Solver::addClause_(vec<Lit> &ps) {
+bool Solver::addClause_(vec<Lit>& ps) {
   assert(decisionLevel() == 0);
   if (!ok)
     return false;
@@ -189,7 +213,7 @@ bool Solver::addClause_(vec<Lit> &ps) {
 }
 
 void Solver::attachClause(CRef cr) {
-  const Clause &c = ca[cr];
+  const Clause& c = ca[cr];
   assert(c.size() > 1);
   watches[~c[0]].push(Watcher(cr, c[1]));
   watches[~c[1]].push(Watcher(cr, c[0]));
@@ -200,7 +224,7 @@ void Solver::attachClause(CRef cr) {
 }
 
 void Solver::detachClause(CRef cr, bool strict) {
-  const Clause &c = ca[cr];
+  const Clause& c = ca[cr];
   assert(c.size() > 1);
 
   // Strict or lazy detaching:
@@ -219,7 +243,7 @@ void Solver::detachClause(CRef cr, bool strict) {
 }
 
 void Solver::removeClause(CRef cr) {
-  Clause &c = ca[cr];
+  Clause& c = ca[cr];
   detachClause(cr);
   // Don't leave pointers to free'd memory!
   if (locked(c))
@@ -228,7 +252,7 @@ void Solver::removeClause(CRef cr) {
   ca.free(cr);
 }
 
-bool Solver::satisfied(const Clause &c) const {
+bool Solver::satisfied(const Clause& c) const {
   for (int i = 0; i < c.size(); i++)
     if (value(c[i]) == l_True)
       return true;
@@ -304,7 +328,7 @@ level of the |        rest of literals. There may be others from the same level
 though.
 |
 |________________________________________________________________________________________________@*/
-void Solver::analyze(CRef confl, vec<Lit> &out_learnt, int &out_btlevel) {
+void Solver::analyze(CRef confl, vec<Lit>& out_learnt, int& out_btlevel) {
   int pathC = 0;
   Lit p = lit_Undef;
 
@@ -315,7 +339,7 @@ void Solver::analyze(CRef confl, vec<Lit> &out_learnt, int &out_btlevel) {
 
   do {
     assert(confl != CRef_Undef); // (otherwise should be UIP)
-    Clause &c = ca[confl];
+    Clause& c = ca[confl];
 
     if (c.learnt())
       claBumpActivity(c);
@@ -361,7 +385,7 @@ void Solver::analyze(CRef confl, vec<Lit> &out_learnt, int &out_btlevel) {
       if (reason(x) == CRef_Undef)
         out_learnt[j++] = out_learnt[i];
       else {
-        Clause &c = ca[reason(var(out_learnt[i]))];
+        Clause& c = ca[reason(var(out_learnt[i]))];
         for (int k = 1; k < c.size(); k++)
           if (!seen[var(c[k])] && level(var(c[k])) > 0) {
             out_learnt[j++] = out_learnt[i];
@@ -403,8 +427,8 @@ bool Solver::litRedundant(Lit p) {
   assert(seen[var(p)] == seen_undef || seen[var(p)] == seen_source);
   assert(reason(var(p)) != CRef_Undef);
 
-  Clause *c = &ca[reason(var(p))];
-  vec<ShrinkStackElem> &stack = analyze_stack;
+  Clause* c = &ca[reason(var(p))];
+  vec<ShrinkStackElem>& stack = analyze_stack;
   stack.clear();
 
   for (uint32_t i = 1;; i++) {
@@ -467,7 +491,7 @@ bool Solver::litRedundant(Lit p) {
 assumptions. |    Calculates the (possibly empty) set of assumptions that led to
 the assignment of 'p', and |    stores the result in 'out_conflict'.
 |________________________________________________________________________________________________@*/
-void Solver::analyzeFinal(Lit p, LSet &out_conflict) {
+void Solver::analyzeFinal(Lit p, LSet& out_conflict) {
   out_conflict.clear();
   out_conflict.insert(p);
 
@@ -483,7 +507,7 @@ void Solver::analyzeFinal(Lit p, LSet &out_conflict) {
         assert(level(x) > 0);
         out_conflict.insert(~trail[i]);
       } else {
-        Clause &c = ca[reason(x)];
+        Clause& c = ca[reason(x)];
         for (int j = 1; j < c.size(); j++)
           if (level(var(c[j])) > 0)
             seen[var(c[j])] = 1;
@@ -519,11 +543,11 @@ CRef Solver::propagate() {
 
   while (qhead < trail.size()) {
     Lit p = trail[qhead++]; // 'p' is enqueued fact to propagate.
-    vec<Watcher> &ws = watches.lookup(p);
+    vec<Watcher>& ws = watches.lookup(p);
     Watcher *i, *j, *end;
     num_props++;
 
-    for (i = j = (Watcher *)ws, end = i + ws.size(); i != end;) {
+    for (i = j = (Watcher*)ws, end = i + ws.size(); i != end;) {
       // Try to avoid inspecting the clause:
       Lit blocker = i->blocker;
       if (value(blocker) == l_True) {
@@ -533,7 +557,7 @@ CRef Solver::propagate() {
 
       // Make sure the false literal is data[1]:
       CRef cr = i->cref;
-      Clause &c = ca[cr];
+      Clause& c = ca[cr];
       Lit false_lit = ~p;
       if (c[0] == false_lit)
         c[0] = c[1], c[1] = false_lit;
@@ -588,8 +612,8 @@ assignment. Locked |    clauses are clauses that are reason to some assignment.
 Binary clauses are never removed.
 |________________________________________________________________________________________________@*/
 struct reduceDB_lt {
-  ClauseAllocator &ca;
-  reduceDB_lt(ClauseAllocator &ca_) : ca(ca_) {}
+  ClauseAllocator& ca;
+  reduceDB_lt(ClauseAllocator& ca_) : ca(ca_) {}
   bool operator()(CRef x, CRef y) {
     return ca[x].size() > 2 &&
            (ca[y].size() == 2 || ca[x].activity() < ca[y].activity());
@@ -604,7 +628,7 @@ void Solver::reduceDB() {
   // Don't delete binary or locked clauses. From the rest, delete clauses from
   // the first half and clauses with activity smaller than 'extra_lim':
   for (i = j = 0; i < learnts.size(); i++) {
-    Clause &c = ca[learnts[i]];
+    Clause& c = ca[learnts[i]];
     if (c.size() > 2 && !locked(c) &&
         (i < learnts.size() / 2 || c.activity() < extra_lim))
       removeClause(learnts[i]);
@@ -615,10 +639,10 @@ void Solver::reduceDB() {
   checkGarbage();
 }
 
-void Solver::removeSatisfied(vec<CRef> &cs) {
+void Solver::removeSatisfied(vec<CRef>& cs) {
   int i, j;
   for (i = j = 0; i < cs.size(); i++) {
-    Clause &c = ca[cs[i]];
+    Clause& c = ca[cs[i]];
     if (satisfied(c))
       removeClause(cs[i]);
     else {
@@ -910,7 +934,7 @@ lbool Solver::solve_() {
   return status;
 }
 
-bool Solver::implies(const vec<Lit> &assumps, vec<Lit> &out) {
+bool Solver::implies(const vec<Lit>& assumps, vec<Lit>& out) {
   trail_lim.push(trail.size());
   for (int i = 0; i < assumps.size(); i++) {
     Lit a = assumps[i];
@@ -940,7 +964,7 @@ bool Solver::implies(const vec<Lit> &assumps, vec<Lit> &out) {
 //
 // FIXME: this needs to be rewritten completely.
 
-static Var mapVar(Var x, vec<Var> &map, Var &max) {
+static Var mapVar(Var x, vec<Var>& map, Var& max) {
   if (map.size() <= x || map[x] == -1) {
     map.growTo(x + 1, -1);
     map[x] = max++;
@@ -948,7 +972,7 @@ static Var mapVar(Var x, vec<Var> &map, Var &max) {
   return map[x];
 }
 
-void Solver::toDimacs(FILE *f, Clause &c, vec<Var> &map, Var &max) {
+void Solver::toDimacs(FILE* f, Clause& c, vec<Var>& map, Var& max) {
   if (satisfied(c))
     return;
 
@@ -959,15 +983,15 @@ void Solver::toDimacs(FILE *f, Clause &c, vec<Var> &map, Var &max) {
   fprintf(f, "0\n");
 }
 
-void Solver::toDimacs(const char *file, const vec<Lit> &assumps) {
-  FILE *f = fopen(file, "wr");
+void Solver::toDimacs(const char* file, const vec<Lit>& assumps) {
+  FILE* f = fopen(file, "wr");
   if (f == NULL)
     fprintf(stderr, "could not open file %s\n", file), exit(1);
   toDimacs(f, assumps);
   fclose(f);
 }
 
-void Solver::toDimacs(FILE *f, const vec<Lit> &assumps) {
+void Solver::toDimacs(FILE* f, const vec<Lit>& assumps) {
   // Handle case when solver is in contradictory state:
   if (!ok) {
     fprintf(f, "p cnf 1 2\n1 0\n-1 0\n");
@@ -986,7 +1010,7 @@ void Solver::toDimacs(FILE *f, const vec<Lit> &assumps) {
 
   for (int i = 0; i < clauses.size(); i++)
     if (!satisfied(ca[clauses[i]])) {
-      Clause &c = ca[clauses[i]];
+      Clause& c = ca[clauses[i]];
       for (int j = 0; j < c.size(); j++)
         if (value(c[j]) != l_False)
           mapVar(var(c[j]), map, max);
@@ -1033,14 +1057,14 @@ void Solver::printStats() const {
 //=================================================================================================
 // Garbage Collection methods:
 
-void Solver::relocAll(ClauseAllocator &to) {
+void Solver::relocAll(ClauseAllocator& to) {
   // All watchers:
   //
   watches.cleanAll();
   for (int v = 0; v < nVars(); v++)
     for (int s = 0; s < 2; s++) {
       Lit p = mkLit(v, s);
-      vec<Watcher> &ws = watches[p];
+      vec<Watcher>& ws = watches[p];
       for (int j = 0; j < ws.size(); j++)
         ca.reloc(ws[j].cref, to);
     }

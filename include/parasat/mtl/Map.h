@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /*******************************************************************************************[Map.h]
 Copyright (c) 2006-2010, Niklas Sorensson
 
@@ -32,17 +56,17 @@ namespace parasat {
 //
 
 template <class K> struct Hash {
-  uint32_t operator()(const K &k) const { return hash(k); }
+  uint32_t operator()(const K& k) const { return hash(k); }
 };
 template <class K> struct Equal {
-  bool operator()(const K &k1, const K &k2) const { return k1 == k2; }
+  bool operator()(const K& k1, const K& k2) const { return k1 == k2; }
 };
 
 template <class K> struct DeepHash {
-  uint32_t operator()(const K *k) const { return hash(*k); }
+  uint32_t operator()(const K* k) const { return hash(*k); }
 };
 template <class K> struct DeepEqual {
-  bool operator()(const K *k1, const K *k2) const { return *k1 == *k2; }
+  bool operator()(const K* k1, const K* k2) const { return *k1 == *k2; }
 };
 
 static inline uint32_t hash(uint32_t x) { return x; }
@@ -76,26 +100,26 @@ private:
   H hash;
   E equals;
 
-  vec<Pair> *table;
+  vec<Pair>* table;
   int cap;
   int size;
 
   // Don't allow copying (error prone):
-  Map<K, D, H, E> &operator=(Map<K, D, H, E> &other);
-  Map(Map<K, D, H, E> &other);
+  Map<K, D, H, E>& operator=(Map<K, D, H, E>& other);
+  Map(Map<K, D, H, E>& other);
 
   bool checkCap(int new_size) const { return new_size > cap; }
 
-  int32_t index(const K &k) const { return hash(k) % cap; }
-  void _insert(const K &k, const D &d) {
-    vec<Pair> &ps = table[index(k)];
+  int32_t index(const K& k) const { return hash(k) % cap; }
+  void _insert(const K& k, const D& d) {
+    vec<Pair>& ps = table[index(k)];
     ps.push();
     ps.last().key = k;
     ps.last().data = d;
   }
 
   void rehash() {
-    const vec<Pair> *old = table;
+    const vec<Pair>* old = table;
 
     int old_cap = cap;
     int newsize = primes[0];
@@ -118,15 +142,15 @@ private:
 
 public:
   Map() : table(NULL), cap(0), size(0) {}
-  Map(const H &h, const E &e)
+  Map(const H& h, const E& e)
       : hash(h), equals(e), table(NULL), cap(0), size(0) {}
   ~Map() { delete[] table; }
 
   // PRECONDITION: the key must already exist in the map.
-  const D &operator[](const K &k) const {
+  const D& operator[](const K& k) const {
     assert(size != 0);
-    const D *res = NULL;
-    const vec<Pair> &ps = table[index(k)];
+    const D* res = NULL;
+    const vec<Pair>& ps = table[index(k)];
     for (int i = 0; i < ps.size(); i++)
       if (equals(ps[i].key, k))
         res = &ps[i].data;
@@ -135,10 +159,10 @@ public:
   }
 
   // PRECONDITION: the key must already exist in the map.
-  D &operator[](const K &k) {
+  D& operator[](const K& k) {
     assert(size != 0);
-    D *res = NULL;
-    vec<Pair> &ps = table[index(k)];
+    D* res = NULL;
+    vec<Pair>& ps = table[index(k)];
     for (int i = 0; i < ps.size(); i++)
       if (equals(ps[i].key, k))
         res = &ps[i].data;
@@ -147,16 +171,16 @@ public:
   }
 
   // PRECONDITION: the key must *NOT* exist in the map.
-  void insert(const K &k, const D &d) {
+  void insert(const K& k, const D& d) {
     if (checkCap(size + 1))
       rehash();
     _insert(k, d);
     size++;
   }
-  bool peek(const K &k, D &d) const {
+  bool peek(const K& k, D& d) const {
     if (size == 0)
       return false;
-    const vec<Pair> &ps = table[index(k)];
+    const vec<Pair>& ps = table[index(k)];
     for (int i = 0; i < ps.size(); i++)
       if (equals(ps[i].key, k)) {
         d = ps[i].data;
@@ -165,10 +189,10 @@ public:
     return false;
   }
 
-  bool has(const K &k) const {
+  bool has(const K& k) const {
     if (size == 0)
       return false;
-    const vec<Pair> &ps = table[index(k)];
+    const vec<Pair>& ps = table[index(k)];
     for (int i = 0; i < ps.size(); i++)
       if (equals(ps[i].key, k))
         return true;
@@ -176,9 +200,9 @@ public:
   }
 
   // PRECONDITION: the key must exist in the map.
-  void remove(const K &k) {
+  void remove(const K& k) {
     assert(table != NULL);
-    vec<Pair> &ps = table[index(k)];
+    vec<Pair>& ps = table[index(k)];
     int j = 0;
     for (; j < ps.size() && !equals(ps[j].key, k); j++)
       ;
@@ -198,7 +222,7 @@ public:
   int bucket_count() const { return cap; }
 
   // NOTE: the hash and equality objects are not moved by this method:
-  void moveTo(Map &other) {
+  void moveTo(Map& other) {
     delete[] other.table;
 
     other.table = table;
@@ -211,7 +235,7 @@ public:
 
   // NOTE: given a bit more time, I could make a more C++-style iterator out of
   // this:
-  const vec<Pair> &bucket(int i) const { return table[i]; }
+  const vec<Pair>& bucket(int i) const { return table[i]; }
 };
 
 //=================================================================================================

@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /****************************************************************************************[IntMap.h]
 Copyright (c) 2011, Niklas Sorensson
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -40,19 +64,19 @@ public:
 
   bool has(K k) const { return index(k) < map.size(); }
 
-  const V &operator[](K k) const {
+  const V& operator[](K k) const {
     assert(has(k));
     return map[index(k)];
   }
-  V &operator[](K k) {
+  V& operator[](K k) {
     assert(has(k));
     return map[index(k)];
   }
 
-  const V *begin() const { return &map[0]; }
-  const V *end() const { return &map[map.size()]; }
-  V *begin() { return &map[0]; }
-  V *end() { return &map[map.size()]; }
+  const V* begin() const { return &map[0]; }
+  const V* end() const { return &map[map.size()]; }
+  V* begin() { return &map[0]; }
+  V* end() { return &map[map.size()]; }
 
   void reserve(K key, V pad) { map.growTo(index(key) + 1, pad); }
   void reserve(K key) { map.growTo(index(key) + 1); }
@@ -66,11 +90,11 @@ public:
   }
 
   void clear(bool dispose = false) { map.clear(dispose); }
-  void moveTo(IntMap &to) {
+  void moveTo(IntMap& to) {
     map.moveTo(to.map);
     to.index = index;
   }
-  void copyTo(IntMap &to) const {
+  void copyTo(IntMap& to) const {
     map.copyTo(to.map);
     to.index = index;
   }
@@ -93,7 +117,7 @@ public:
   }
 
   // Allow inspecting the internal vector:
-  const vec<K> &toVec() const { return xs; }
+  const vec<K>& toVec() const { return xs; }
 
   // Vector interface:
   K operator[](int index) const { return xs[index]; }

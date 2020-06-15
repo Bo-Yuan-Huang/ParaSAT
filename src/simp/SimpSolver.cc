@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /***********************************************************************************[SimpSolver.cc]
 Copyright (c) 2006,      Niklas Een, Niklas Sorensson
 Copyright (c) 2007-2010, Niklas Sorensson
@@ -29,7 +53,7 @@ using namespace parasat;
 //=================================================================================================
 // Options:
 
-static const char *_cat = "SIMP";
+static const char* _cat = "SIMP";
 
 static BoolOption opt_use_asymm(_cat, "asymm",
                                 "Shrink clauses by asymmetric branching.",
@@ -146,7 +170,7 @@ lbool SimpSolver::solve_(bool do_simp, bool turn_off_simp) {
   return result;
 }
 
-bool SimpSolver::addClause_(vec<Lit> &ps) {
+bool SimpSolver::addClause_(vec<Lit>& ps) {
 #ifndef NDEBUG
   for (int i = 0; i < ps.size(); i++)
     assert(!isEliminated(var(ps[i])));
@@ -162,7 +186,7 @@ bool SimpSolver::addClause_(vec<Lit> &ps) {
 
   if (use_simplification && clauses.size() == nclauses + 1) {
     CRef cr = clauses.last();
-    const Clause &c = ca[cr];
+    const Clause& c = ca[cr];
 
     // NOTE: the clause is added to the queue immediately and then
     // again during 'gatherTouchedClauses()'. If nothing happens
@@ -185,7 +209,7 @@ bool SimpSolver::addClause_(vec<Lit> &ps) {
 }
 
 void SimpSolver::removeClause(CRef cr) {
-  const Clause &c = ca[cr];
+  const Clause& c = ca[cr];
 
   if (use_simplification)
     for (int i = 0; i < c.size(); i++) {
@@ -198,7 +222,7 @@ void SimpSolver::removeClause(CRef cr) {
 }
 
 bool SimpSolver::strengthenClause(CRef cr, Lit l) {
-  Clause &c = ca[cr];
+  Clause& c = ca[cr];
   assert(decisionLevel() == 0);
   assert(use_simplification);
 
@@ -223,14 +247,14 @@ bool SimpSolver::strengthenClause(CRef cr, Lit l) {
 
 // Returns FALSE if clause is always satisfied ('out_clause' should not be
 // used).
-bool SimpSolver::merge(const Clause &_ps, const Clause &_qs, Var v,
-                       vec<Lit> &out_clause) {
+bool SimpSolver::merge(const Clause& _ps, const Clause& _qs, Var v,
+                       vec<Lit>& out_clause) {
   merges++;
   out_clause.clear();
 
   bool ps_smallest = _ps.size() < _qs.size();
-  const Clause &ps = ps_smallest ? _qs : _ps;
-  const Clause &qs = ps_smallest ? _ps : _qs;
+  const Clause& ps = ps_smallest ? _qs : _ps;
+  const Clause& qs = ps_smallest ? _ps : _qs;
 
   for (int i = 0; i < qs.size(); i++) {
     if (var(qs[i]) != v) {
@@ -254,14 +278,14 @@ bool SimpSolver::merge(const Clause &_ps, const Clause &_qs, Var v,
 }
 
 // Returns FALSE if clause is always satisfied.
-bool SimpSolver::merge(const Clause &_ps, const Clause &_qs, Var v, int &size) {
+bool SimpSolver::merge(const Clause& _ps, const Clause& _qs, Var v, int& size) {
   merges++;
 
   bool ps_smallest = _ps.size() < _qs.size();
-  const Clause &ps = ps_smallest ? _qs : _ps;
-  const Clause &qs = ps_smallest ? _ps : _qs;
-  const Lit *__ps = (const Lit *)ps;
-  const Lit *__qs = (const Lit *)qs;
+  const Clause& ps = ps_smallest ? _qs : _ps;
+  const Clause& qs = ps_smallest ? _ps : _qs;
+  const Lit* __ps = (const Lit*)ps;
+  const Lit* __qs = (const Lit*)qs;
 
   size = ps.size() - 1;
 
@@ -293,7 +317,7 @@ void SimpSolver::gatherTouchedClauses() {
 
   for (i = 0; i < nVars(); i++)
     if (touched[i]) {
-      const vec<CRef> &cs = occurs.lookup(i);
+      const vec<CRef>& cs = occurs.lookup(i);
       for (j = 0; j < cs.size(); j++)
         if (ca[cs[j]].mark() == 0) {
           subsumption_queue.insert(cs[j]);
@@ -309,7 +333,7 @@ void SimpSolver::gatherTouchedClauses() {
   n_touched = 0;
 }
 
-bool SimpSolver::implied(const vec<Lit> &c) {
+bool SimpSolver::implied(const vec<Lit>& c) {
   assert(decisionLevel() == 0);
 
   trail_lim.push(trail.size());
@@ -354,7 +378,7 @@ bool SimpSolver::backwardSubsumptionCheck(bool verbose) {
 
     CRef cr = subsumption_queue.peek();
     subsumption_queue.pop();
-    Clause &c = ca[cr];
+    Clause& c = ca[cr];
 
     if (c.mark())
       continue;
@@ -374,8 +398,8 @@ bool SimpSolver::backwardSubsumptionCheck(bool verbose) {
         best = var(c[i]);
 
     // Search all candidates:
-    vec<CRef> &_cs = occurs.lookup(best);
-    CRef *cs = (CRef *)_cs;
+    vec<CRef>& _cs = occurs.lookup(best);
+    CRef* cs = (CRef*)_cs;
 
     for (int j = 0; j < _cs.size(); j++)
       if (c.mark())
@@ -404,7 +428,7 @@ bool SimpSolver::backwardSubsumptionCheck(bool verbose) {
 }
 
 bool SimpSolver::asymm(Var v, CRef cr) {
-  Clause &c = ca[cr];
+  Clause& c = ca[cr];
   assert(decisionLevel() == 0);
 
   if (c.mark() || satisfied(c))
@@ -432,7 +456,7 @@ bool SimpSolver::asymm(Var v, CRef cr) {
 bool SimpSolver::asymmVar(Var v) {
   assert(use_simplification);
 
-  const vec<CRef> &cls = occurs.lookup(v);
+  const vec<CRef>& cls = occurs.lookup(v);
 
   if (value(v) != l_Undef || cls.size() == 0)
     return true;
@@ -444,12 +468,12 @@ bool SimpSolver::asymmVar(Var v) {
   return backwardSubsumptionCheck();
 }
 
-static void mkElimClause(vec<uint32_t> &elimclauses, Lit x) {
+static void mkElimClause(vec<uint32_t>& elimclauses, Lit x) {
   elimclauses.push(toInt(x));
   elimclauses.push(1);
 }
 
-static void mkElimClause(vec<uint32_t> &elimclauses, Var v, Clause &c) {
+static void mkElimClause(vec<uint32_t>& elimclauses, Var v, Clause& c) {
   int first = elimclauses.size();
   int v_pos = -1;
 
@@ -479,7 +503,7 @@ bool SimpSolver::eliminateVar(Var v) {
 
   // Split the occurrences into positive and negative:
   //
-  const vec<CRef> &cls = occurs.lookup(v);
+  const vec<CRef>& cls = occurs.lookup(v);
   vec<CRef> pos, neg;
   for (int i = 0; i < cls.size(); i++)
     (find(ca[cls[i]], mkLit(v)) ? pos : neg).push(cls[i]);
@@ -517,7 +541,7 @@ bool SimpSolver::eliminateVar(Var v) {
     removeClause(cls[i]);
 
   // Produce clauses in cross product:
-  vec<Lit> &resolvent = add_tmp;
+  vec<Lit>& resolvent = add_tmp;
   for (int i = 0; i < pos.size(); i++)
     for (int j = 0; j < neg.size(); j++)
       if (merge(ca[pos[i]], ca[neg[j]], v, resolvent) && !addClause_(resolvent))
@@ -545,11 +569,11 @@ bool SimpSolver::substitute(Var v, Lit x) {
 
   eliminated[v] = true;
   setDecisionVar(v, false);
-  const vec<CRef> &cls = occurs.lookup(v);
+  const vec<CRef>& cls = occurs.lookup(v);
 
-  vec<Lit> &subst_clause = add_tmp;
+  vec<Lit>& subst_clause = add_tmp;
   for (int i = 0; i < cls.size(); i++) {
-    Clause &c = ca[cls[i]];
+    Clause& c = ca[cls[i]];
 
     subst_clause.clear();
     for (int j = 0; j < c.size(); j++) {
@@ -685,7 +709,7 @@ cleanup:
 //=================================================================================================
 // Garbage Collection methods:
 
-void SimpSolver::relocAll(ClauseAllocator &to) {
+void SimpSolver::relocAll(ClauseAllocator& to) {
   if (!use_simplification)
     return;
 
@@ -693,7 +717,7 @@ void SimpSolver::relocAll(ClauseAllocator &to) {
   //
   for (int i = 0; i < nVars(); i++) {
     occurs.clean(i);
-    vec<CRef> &cs = occurs[i];
+    vec<CRef>& cs = occurs[i];
     for (int j = 0; j < cs.size(); j++)
       ca.reloc(cs[j], to);
   }

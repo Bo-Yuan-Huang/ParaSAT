@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /************************************************************************************[SimpSolver.h]
 Copyright (c) 2006,      Niklas Een, Niklas Sorensson
 Copyright (c) 2007-2010, Niklas Sorensson
@@ -41,14 +65,14 @@ public:
   //
   Var newVar(lbool upol = l_Undef, bool dvar = true);
   void releaseVar(Lit l);
-  bool addClause(const vec<Lit> &ps);
+  bool addClause(const vec<Lit>& ps);
   bool addEmptyClause();               // Add the empty clause to the solver.
   bool addClause(Lit p);               // Add a unit clause to the solver.
   bool addClause(Lit p, Lit q);        // Add a binary clause to the solver.
   bool addClause(Lit p, Lit q, Lit r); // Add a ternary clause to the solver.
   bool addClause(Lit p, Lit q, Lit r,
                  Lit s); // Add a quaternary clause to the solver.
-  bool addClause_(vec<Lit> &ps);
+  bool addClause_(vec<Lit>& ps);
   bool substitute(
       Var v,
       Lit x); // Replace all occurences of v with x (may cause a contradiction).
@@ -65,9 +89,9 @@ public:
 
   // Solving:
   //
-  bool solve(const vec<Lit> &assumps, bool do_simp = true,
+  bool solve(const vec<Lit>& assumps, bool do_simp = true,
              bool turn_off_simp = false);
-  lbool solveLimited(const vec<Lit> &assumps, bool do_simp = true,
+  lbool solveLimited(const vec<Lit>& assumps, bool do_simp = true,
                      bool turn_off_simp = false);
   bool solve(bool do_simp = true, bool turn_off_simp = false);
   bool solve(Lit p, bool do_simp = true, bool turn_off_simp = false);
@@ -120,8 +144,8 @@ protected:
   // Helper structures:
   //
   struct ElimLt {
-    const LMap<int> &n_occ;
-    explicit ElimLt(const LMap<int> &no) : n_occ(no) {}
+    const LMap<int>& n_occ;
+    explicit ElimLt(const LMap<int>& no) : n_occ(no) {}
 
     // TODO: are 64-bit operations here noticably bad on 32-bit platforms? Could
     // use a saturating 32-bit implementation instead then, but this will have
@@ -139,9 +163,9 @@ protected:
   };
 
   struct ClauseDeleted {
-    const ClauseAllocator &ca;
-    explicit ClauseDeleted(const ClauseAllocator &_ca) : ca(_ca) {}
-    bool operator()(const CRef &cr) const { return ca[cr].mark() == 1; }
+    const ClauseAllocator& ca;
+    explicit ClauseDeleted(const ClauseAllocator& _ca) : ca(_ca) {}
+    bool operator()(const CRef& cr) const { return ca[cr].mark() == 1; }
   };
 
   // Solver state:
@@ -172,16 +196,16 @@ protected:
   bool asymmVar(Var v);
   void updateElimHeap(Var v);
   void gatherTouchedClauses();
-  bool merge(const Clause &_ps, const Clause &_qs, Var v, vec<Lit> &out_clause);
-  bool merge(const Clause &_ps, const Clause &_qs, Var v, int &size);
+  bool merge(const Clause& _ps, const Clause& _qs, Var v, vec<Lit>& out_clause);
+  bool merge(const Clause& _ps, const Clause& _qs, Var v, int& size);
   bool backwardSubsumptionCheck(bool verbose = false);
   bool eliminateVar(Var v);
   void extendModel();
 
   void removeClause(CRef cr);
   bool strengthenClause(CRef cr, Lit l);
-  bool implied(const vec<Lit> &c);
-  void relocAll(ClauseAllocator &to);
+  bool implied(const vec<Lit>& c);
+  void relocAll(ClauseAllocator& to);
 };
 
 //=================================================================================================
@@ -196,7 +220,7 @@ inline void SimpSolver::updateElimHeap(Var v) {
     elim_heap.update(v);
 }
 
-inline bool SimpSolver::addClause(const vec<Lit> &ps) {
+inline bool SimpSolver::addClause(const vec<Lit>& ps) {
   ps.copyTo(add_tmp);
   return addClause_(add_tmp);
 }
@@ -281,14 +305,14 @@ inline bool SimpSolver::solve(Lit p, Lit q, Lit r, bool do_simp,
   assumptions.push(r);
   return solve_(do_simp, turn_off_simp) == l_True;
 }
-inline bool SimpSolver::solve(const vec<Lit> &assumps, bool do_simp,
+inline bool SimpSolver::solve(const vec<Lit>& assumps, bool do_simp,
                               bool turn_off_simp) {
   budgetOff();
   assumps.copyTo(assumptions);
   return solve_(do_simp, turn_off_simp) == l_True;
 }
 
-inline lbool SimpSolver::solveLimited(const vec<Lit> &assumps, bool do_simp,
+inline lbool SimpSolver::solveLimited(const vec<Lit>& assumps, bool do_simp,
                                       bool turn_off_simp) {
   assumps.copyTo(assumptions);
   return solve_(do_simp, turn_off_simp);

@@ -1,3 +1,27 @@
+// =============================================================================
+// MIT License
+//
+// Copyright (c) 2020 Princeton University
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// =============================================================================
+
 /***********************************************************************************[SolverTypes.h]
 Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
 Copyright (c) 2007-2010, Niklas Sorensson
@@ -181,7 +205,7 @@ class Clause {
 
   // NOTE: This constructor cannot be used directly (doesn't allocate enough
   // memory).
-  Clause(const vec<Lit> &ps, bool use_extra, bool learnt) {
+  Clause(const vec<Lit>& ps, bool use_extra, bool learnt) {
     header.mark = 0;
     header.learnt = learnt;
     header.has_extra = use_extra;
@@ -201,7 +225,7 @@ class Clause {
 
   // NOTE: This constructor cannot be used directly (doesn't allocate enough
   // memory).
-  Clause(const Clause &from, bool use_extra) {
+  Clause(const Clause& from, bool use_extra) {
     header = from.header;
     header.has_extra =
         use_extra; // NOTE: the copied clause may lose the extra field.
@@ -238,7 +262,7 @@ public:
   bool has_extra() const { return header.has_extra; }
   uint32_t mark() const { return header.mark; }
   void mark(uint32_t m) { header.mark = m; }
-  const Lit &last() const { return data[header.size - 1].lit; }
+  const Lit& last() const { return data[header.size - 1].lit; }
 
   bool reloced() const { return header.reloced; }
   CRef relocation() const { return data[0].rel; }
@@ -250,11 +274,11 @@ public:
   // NOTE: somewhat unsafe to change the clause in-place! Must manually call
   // 'calcAbstraction' afterwards for
   //       subsumption operations to behave correctly.
-  Lit &operator[](int i) { return data[i].lit; }
+  Lit& operator[](int i) { return data[i].lit; }
   Lit operator[](int i) const { return data[i].lit; }
-  operator const Lit *(void)const { return (Lit *)data; }
+  operator const Lit*(void)const { return (Lit*)data; }
 
-  float &activity() {
+  float& activity() {
     assert(header.has_extra);
     return data[header.size].act;
   }
@@ -263,7 +287,7 @@ public:
     return data[header.size].abs;
   }
 
-  Lit subsumes(const Clause &other) const;
+  Lit subsumes(const Clause& other) const;
   void strengthen(Lit p);
 };
 
@@ -288,12 +312,12 @@ public:
       : ra(start_cap), extra_clause_field(false) {}
   ClauseAllocator() : extra_clause_field(false) {}
 
-  void moveTo(ClauseAllocator &to) {
+  void moveTo(ClauseAllocator& to) {
     to.extra_clause_field = extra_clause_field;
     ra.moveTo(to.ra);
   }
 
-  CRef alloc(const vec<Lit> &ps, bool learnt = false) {
+  CRef alloc(const vec<Lit>& ps, bool learnt = false) {
     assert(sizeof(Lit) == sizeof(uint32_t));
     assert(sizeof(float) == sizeof(uint32_t));
     bool use_extra = learnt | extra_clause_field;
@@ -303,7 +327,7 @@ public:
     return cid;
   }
 
-  CRef alloc(const Clause &from) {
+  CRef alloc(const Clause& from) {
     bool use_extra = from.learnt() | extra_clause_field;
     CRef cid = ra.alloc(clauseWord32Size(from.size(), use_extra));
     new (lea(cid)) Clause(from, use_extra);
@@ -314,22 +338,22 @@ public:
   uint32_t wasted() const { return ra.wasted(); }
 
   // Deref, Load Effective Address (LEA), Inverse of LEA (AEL):
-  Clause &operator[](CRef r) { return (Clause &)ra[r]; }
-  const Clause &operator[](CRef r) const { return (Clause &)ra[r]; }
-  Clause *lea(CRef r) { return (Clause *)ra.lea(r); }
-  const Clause *lea(CRef r) const {
-    return (Clause *)ra.lea(r);
+  Clause& operator[](CRef r) { return (Clause&)ra[r]; }
+  const Clause& operator[](CRef r) const { return (Clause&)ra[r]; }
+  Clause* lea(CRef r) { return (Clause*)ra.lea(r); }
+  const Clause* lea(CRef r) const {
+    return (Clause*)ra.lea(r);
     ;
   }
-  CRef ael(const Clause *t) { return ra.ael((uint32_t *)t); }
+  CRef ael(const Clause* t) { return ra.ael((uint32_t*)t); }
 
   void free(CRef cid) {
-    Clause &c = operator[](cid);
+    Clause& c = operator[](cid);
     ra.free(clauseWord32Size(c.size(), c.has_extra()));
   }
 
-  void reloc(CRef &cr, ClauseAllocator &to) {
-    Clause &c = operator[](cr);
+  void reloc(CRef& cr, ClauseAllocator& to) {
+    Clause& c = operator[](cr);
 
     if (c.reloced()) {
       cr = c.relocation();
@@ -346,32 +370,32 @@ public:
 // assignments):
 
 class ClauseIterator {
-  const ClauseAllocator &ca;
-  const CRef *crefs;
+  const ClauseAllocator& ca;
+  const CRef* crefs;
 
 public:
-  ClauseIterator(const ClauseAllocator &_ca, const CRef *_crefs)
+  ClauseIterator(const ClauseAllocator& _ca, const CRef* _crefs)
       : ca(_ca), crefs(_crefs) {}
 
   void operator++() { crefs++; }
-  const Clause &operator*() const { return ca[*crefs]; }
+  const Clause& operator*() const { return ca[*crefs]; }
 
   // NOTE: does not compare that references use the same clause-allocator:
-  bool operator==(const ClauseIterator &ci) const { return crefs == ci.crefs; }
-  bool operator!=(const ClauseIterator &ci) const { return crefs != ci.crefs; }
+  bool operator==(const ClauseIterator& ci) const { return crefs == ci.crefs; }
+  bool operator!=(const ClauseIterator& ci) const { return crefs != ci.crefs; }
 };
 
 class TrailIterator {
-  const Lit *lits;
+  const Lit* lits;
 
 public:
-  TrailIterator(const Lit *_lits) : lits(_lits) {}
+  TrailIterator(const Lit* _lits) : lits(_lits) {}
 
   void operator++() { lits++; }
   Lit operator*() const { return *lits; }
 
-  bool operator==(const TrailIterator &ti) const { return lits == ti.lits; }
-  bool operator!=(const TrailIterator &ti) const { return lits != ti.lits; }
+  bool operator==(const TrailIterator& ti) const { return lits == ti.lits; }
+  bool operator!=(const TrailIterator& ti) const { return lits != ti.lits; }
 };
 
 //=================================================================================================
@@ -385,24 +409,24 @@ class OccLists {
   Deleted deleted;
 
 public:
-  OccLists(const Deleted &d, MkIndex _index = MkIndex())
+  OccLists(const Deleted& d, MkIndex _index = MkIndex())
       : occs(_index), dirty(_index), deleted(d) {}
 
-  void init(const K &idx) {
+  void init(const K& idx) {
     occs.reserve(idx);
     occs[idx].clear();
     dirty.reserve(idx, 0);
   }
-  Vec &operator[](const K &idx) { return occs[idx]; }
-  Vec &lookup(const K &idx) {
+  Vec& operator[](const K& idx) { return occs[idx]; }
+  Vec& lookup(const K& idx) {
     if (dirty[idx])
       clean(idx);
     return occs[idx];
   }
 
   void cleanAll();
-  void clean(const K &idx);
-  void smudge(const K &idx) {
+  void clean(const K& idx);
+  void smudge(const K& idx) {
     if (dirty[idx] == 0) {
       dirty[idx] = 1;
       dirties.push(idx);
@@ -427,8 +451,8 @@ void OccLists<K, Vec, Deleted, MkIndex>::cleanAll() {
 }
 
 template <class K, class Vec, class Deleted, class MkIndex>
-void OccLists<K, Vec, Deleted, MkIndex>::clean(const K &idx) {
-  Vec &vec = occs[idx];
+void OccLists<K, Vec, Deleted, MkIndex>::clean(const K& idx) {
+  Vec& vec = occs[idx];
   int i, j;
   for (i = j = 0; i < vec.size(); i++)
     if (!deleted(vec[i]))
@@ -454,25 +478,25 @@ public:
   int size() const { return map.elems(); }
 
   // Insert/Remove/Test mapping:
-  void insert(CRef cr, const T &t) { map.insert(cr, t); }
-  void growTo(CRef cr, const T &t) {
+  void insert(CRef cr, const T& t) { map.insert(cr, t); }
+  void growTo(CRef cr, const T& t) {
     map.insert(cr, t);
   } // NOTE: for compatibility
   void remove(CRef cr) { map.remove(cr); }
-  bool has(CRef cr, T &t) { return map.peek(cr, t); }
+  bool has(CRef cr, T& t) { return map.peek(cr, t); }
 
   // Vector interface (the clause 'c' must already exist):
-  const T &operator[](CRef cr) const { return map[cr]; }
-  T &operator[](CRef cr) { return map[cr]; }
+  const T& operator[](CRef cr) const { return map[cr]; }
+  T& operator[](CRef cr) { return map[cr]; }
 
   // Iteration (not transparent at all at the moment):
   int bucket_count() const { return map.bucket_count(); }
-  const vec<typename HashTable::Pair> &bucket(int i) const {
+  const vec<typename HashTable::Pair>& bucket(int i) const {
     return map.bucket(i);
   }
 
   // Move contents to other map:
-  void moveTo(CMap &other) { map.moveTo(other.map); }
+  void moveTo(CMap& other) { map.moveTo(other.map); }
 
   // TMP debug:
   void debug() {
@@ -493,7 +517,7 @@ used to simplify 'other' |       by subsumption resolution.
 |       lit_Undef  - Clause subsumes 'other'
 |       p          - The literal p can be deleted from 'other'
 |________________________________________________________________________________________________@*/
-inline Lit Clause::subsumes(const Clause &other) const {
+inline Lit Clause::subsumes(const Clause& other) const {
   // if (other.size() < size() || (extra.abst & ~other.extra.abst) != 0)
   // if (other.size() < size() || (!learnt() && !other.learnt() && (extra.abst &
   // ~other.extra.abst) != 0))
@@ -506,8 +530,8 @@ inline Lit Clause::subsumes(const Clause &other) const {
     return lit_Error;
 
   Lit ret = lit_Undef;
-  const Lit *c = (const Lit *)(*this);
-  const Lit *d = (const Lit *)other;
+  const Lit* c = (const Lit*)(*this);
+  const Lit* d = (const Lit*)other;
 
   for (unsigned i = 0; i < header.size; i++) {
     // search for c[i] or ~c[i]
