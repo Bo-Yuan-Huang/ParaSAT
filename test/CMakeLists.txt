@@ -21,10 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # ==============================================================================
-
-# ---------------------------------------------------------------------------- #
-# External dependency
-# ---------------------------------------------------------------------------- #
+##
+## Google test dependency
+##
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
