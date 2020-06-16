@@ -28,6 +28,7 @@
 # ---------------------------------------------------------------------------- #
 add_library(${PARASAT_LIB_NAME} 
   ${CMAKE_CURRENT_SOURCE_DIR}/core/Solver.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils/Logging.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/utils/Options.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/utils/System.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/simp/SimpSolver.cc

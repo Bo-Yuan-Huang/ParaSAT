@@ -22,17 +22,6 @@
 # SOFTWARE.
 # ==============================================================================
 ##
-## Google test dependency
-##
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        release-1.10.0
-)
-
-FetchContent_MakeAvailable(googletest)
-
-##
 ## To keep cache clean
 ##
 mark_as_advanced(
@@ -60,6 +49,20 @@ macro(package_add_test TESTNAME)
 endmacro()
 
 # ---------------------------------------------------------------------------- #
+# External dependencies
+# ---------------------------------------------------------------------------- #
+# nlohmann_json::nlohmann_json
+FetchContent_Declare(
+  json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG        v3.8.0
+)
+
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+
+FetchContent_MakeAvailable(json)
+
+# ---------------------------------------------------------------------------- #
 # TARGET
 # unit tests 
 # ---------------------------------------------------------------------------- #
@@ -67,7 +70,7 @@ set(PARASAT_TEST_MAIN sanity_check)
 
 package_add_test(${PARASAT_TEST_MAIN} 
   main.cc
-  run_satcomp_bench.cc
+  t_sat19_rand.cc
 )
 
 set(PARASAT_TEST_SRC_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -79,6 +82,7 @@ configure_file(
 )
 
 target_link_libraries(${PARASAT_TEST_MAIN} ${PARASAT_LIB_NAME})
+target_link_libraries(${PARASAT_TEST_MAIN} nlohmann_json::nlohmann_json)
 
 add_custom_target(run
   COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${PARASAT_TEST_MAIN}"

@@ -75,6 +75,8 @@ FetchContent_Declare(
   GIT_TAG        v0.4.0
 )
 
+set(WITH_GFLAGS OFF CACHE INTERNAL "")
+
 # fmt::fmt
 FetchContent_Declare(
   fmt
@@ -89,8 +91,26 @@ FetchContent_Declare(
   GIT_TAG        1.4
 )
 
+# gtest gmock gtest_main
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        release-1.10.0
+)
+
+# absl::*
+FetchContent_Declare(
+  abseil
+  GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git
+  GIT_TAG        20200225.2
+)
+
+set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "")
+# set(ABSL_USE_GOOGLETEST_HEAD ON)
+# set(ABSL_RUN_TESTS OFF)
+
 # populate external packages
-FetchContent_MakeAvailable(glog fmt lyra)
+FetchContent_MakeAvailable(glog fmt lyra googletest abseil)
 
 # ---------------------------------------------------------------------------- #
 # TARGET
