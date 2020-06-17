@@ -70,7 +70,8 @@ set(PARASAT_TEST_MAIN sanity_check)
 
 package_add_test(${PARASAT_TEST_MAIN} 
   main.cc
-  t_sat19_rand.cc
+  t_sc18_main.cc
+  t_sc18_rand.cc
 )
 
 set(PARASAT_TEST_SRC_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -86,5 +87,9 @@ target_link_libraries(${PARASAT_TEST_MAIN} nlohmann_json::nlohmann_json)
 
 add_custom_target(run
   COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${PARASAT_TEST_MAIN}"
+)
+
+add_custom_target(hard
+  COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${PARASAT_TEST_MAIN}" --gtest_also_run_disabled_tests
 )
 

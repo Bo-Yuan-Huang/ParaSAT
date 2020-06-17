@@ -108,7 +108,8 @@ int main(int argc, char** argv) {
     ret_code = 0;
   }
 
-  PSAT_LOG << (ret_code == 10) ? "sat" : (ret_code == 20) ? "unsat" : "unknown";
+  PSAT_LOG << ((ret_code == 10) ? "sat"
+                                : (ret_code == 20) ? "unsat" : "unknown");
 
   return ret_code;
 }

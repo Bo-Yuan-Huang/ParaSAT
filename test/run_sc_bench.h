@@ -22,9 +22,13 @@
 // SOFTWARE.
 // =============================================================================
 
+#ifndef TEST_RUN_SC_BENCH_H__
+#define TEST_RUN_SC_BENCH_H__
+
 #include <filesystem>
 #include <fstream>
 
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 #include <parasat/core/Dimacs.h>
 #include <parasat/core/Solver.h>
@@ -42,15 +46,15 @@ using json = nlohmann::json;
 static decltype(json::object()) reference;
 static fs::path current_ref_file;
 
-class TestSat19Rand : public ::testing::Test {
+class TestRunScBench : public ::testing::Test {
 public:
-  TestSat19Rand() {}
-  ~TestSat19Rand() {}
+  TestRunScBench() {}
+  ~TestRunScBench() {}
 
   void SetUp() {}
   void TearDown() {}
 
-  fs::path rand_root = fs::path(PARASAT_TEST_DATA_DIR) / "sat19_rand";
+  // fs::path rand_root;
   fs::path data_dir;
 
   int Solve(const fs::path& file) {
@@ -80,6 +84,8 @@ public:
       auto ref = reference.at(file).get<int>();
       // compare
       EXPECT_EQ(ref, ret);
+    } else {
+      PSAT_ERROR << fmt::format("No file named {} found", input_file.string());
     }
   }
 
@@ -102,34 +108,8 @@ public:
     }
   }
 
-}; // class TestSat19Rand
-
-class TestRndBarthel : public TestSat19Rand {
-public:
-  void SetUp() {
-    InitReference("ref_rnd_barthel.json");
-    data_dir = rand_root / "cnf" / "rnd-barthel";
-  }
-}; // class TestRndBarthel
-
-TEST_F(TestRndBarthel, fla_barthel_200_1) { Check("fla-barthel-200-1.cnf"); }
-TEST_F(TestRndBarthel, fla_barthel_200_2) { Check("fla-barthel-200-2.cnf"); }
-TEST_F(TestRndBarthel, fla_barthel_200_3) { Check("fla-barthel-200-3.cnf"); }
-TEST_F(TestRndBarthel, fla_barthel_200_4) { Check("fla-barthel-200-4.cnf"); }
-TEST_F(TestRndBarthel, fla_barthel_200_5) { Check("fla-barthel-200-5.cnf"); }
-
-class TestRndKomb : public TestSat19Rand {
-public:
-  void SetUp() {
-    InitReference("ref_rnd_komb.json");
-    data_dir = rand_root / "cnf" / "rnd-komb";
-  }
-}; // class TestRndKomb
-
-TEST_F(TestRndKomb, fla_komb_200_1) { Check("fla-komb-200-1.cnf"); }
-TEST_F(TestRndKomb, fla_komb_200_2) { Check("fla-komb-200-2.cnf"); }
-TEST_F(TestRndKomb, fla_komb_200_3) { Check("fla-komb-200-3.cnf"); }
-TEST_F(TestRndKomb, fla_komb_200_4) { Check("fla-komb-200-4.cnf"); }
-TEST_F(TestRndKomb, fla_komb_200_5) { Check("fla-komb-200-5.cnf"); }
+}; // class TestRunScBench
 
 }; // namespace parasat
+
+#endif // TEST_RUN_SC_BENCH_H__
