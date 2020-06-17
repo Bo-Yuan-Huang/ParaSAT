@@ -33,6 +33,7 @@
 #include <parasat/core/Dimacs.h>
 #include <parasat/core/Solver.h>
 #include <parasat/utils/Logging.h>
+#include <parasat/utils/System.h>
 
 #include "gtest/gtest.h"
 
@@ -59,6 +60,10 @@ public:
 
   int Solve(const fs::path& file) {
     Solver s;
+    
+    // set budget based on SAT competition
+    limitTime(5000);
+    limitMemory(24 * 1024);
 
     gzFile in = gzopen(file.c_str(), "rb");
     parse_DIMACS(in, s, false);
