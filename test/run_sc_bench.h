@@ -60,9 +60,9 @@ public:
 
   int Solve(const fs::path& file) {
     Solver s;
-    
+
     // set budget based on SAT competition
-    limitTime(5000);
+    // limitTime(5000); // XXX this applies to the whole gtest instance
     limitMemory(24 * 1024);
 
     gzFile in = gzopen(file.c_str(), "rb");
