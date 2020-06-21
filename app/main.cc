@@ -24,11 +24,14 @@
 
 #include <filesystem>
 #include <string>
+#include <vector>
 
 #include <absl/flags/flag.h>
 #include <absl/flags/parse.h>
 #include <absl/flags/usage.h>
+#include <fmt/format.h>
 #include <lyra/lyra.hpp>
+#include <taskflow/taskflow.hpp>
 
 #include <parasat/core/Dimacs.h>
 #include <parasat/core/Solver.h>
@@ -51,6 +54,8 @@ static void SIGINT_exit(int) {
   _exit(1);
 }
 
+ABSL_FLAG(uint32_t, jobs, 4, "Number of parallel jobs");
+
 int main(int argc, char** argv) {
   SetToStdErr(true);
 
@@ -62,7 +67,8 @@ int main(int argc, char** argv) {
              lyra::arg(input_file, "input")("input cnf file");
 
   auto result = cli.parse({argc, argv});
-  PSAT_CHECK(result) << result.errorMessage();
+  // ignore check to allow flags
+  // PSAT_CHECK(result) << result.errorMessage();
 
   if (show_help_msg) {
     PSAT_LOG << cli;
@@ -74,6 +80,50 @@ int main(int argc, char** argv) {
   // enable flags
   absl::SetProgramUsageMessage("MiniSAT-based Parallel SAT solver");
   absl::ParseCommandLine(argc, argv);
+
+  // get flags
+  auto job_num = absl::GetFlag(FLAGS_jobs);
+
+  // ****** testing taskflow ******
+  std::vector<Solver*> solvers;
+  for (auto i = 0; i < job_num; i++) {
+    auto s_ptr = new Solver();
+    solvers.push_back(s_ptr);
+  }
+
+  for (auto s_ptr : solvers) {
+    gzFile in = gzopen(input_file.c_str(), "rb");
+    parse_DIMACS(in, *s_ptr, false);
+    gzclose(in);
+  }
+
+  tf::Taskflow taskflow;
+
+  auto exe_solve = [&](auto job_id) {
+    PSAT_LOG << "Start task " << job_id;
+    int ret_code = 0;
+    vec<Lit> dummy;
+    try {
+      auto ret = solvers[job_id]->solveLimited(dummy);
+      ret_code = ((ret == l_True) ? 10 : (ret == l_False) ? 20 : 0);
+    } catch (OutOfMemoryException&) {
+      ret_code = 0;
+    }
+    PSAT_LOG << fmt::format("Task {} result: {}", job_id, ret_code);
+  };
+
+  for (auto i = 0; i < job_num; i++) {
+    auto exe_solve_wrap = [=]() { exe_solve(i); };
+    auto task_i = taskflow.emplace(exe_solve_wrap);
+  }
+
+  tf::Executor executor;
+  executor.run(taskflow).wait();
+
+  for (auto i = 0; i < job_num; i++) {
+    delete solvers[i];
+  }
+  // ****** end testing taskflow ******
 
   // initiate the solver
   Solver s;
